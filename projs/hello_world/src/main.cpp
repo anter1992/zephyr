@@ -2,6 +2,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
 #include <stdio.h>
+#include <zephyr/zbus/zbus.h>
 
 /* Reserved GPIO pins for esp32
 &gpio0 {
@@ -21,17 +22,41 @@ static const struct device *gpio_dev = DEVICE_DT_GET(DT_NODELABEL(gpio0));
 
 static struct gpio_callback button_cb_data;
 
-void button_pressed(const struct device *dev,
-		    struct gpio_callback *cb,
-		    uint32_t pins)
+ZBUS_CHAN_DEFINE(gpio_input_data_chan,  		/* Name */
+		 uint8_t, 								/* Message type */
+		 NULL,                                 	/* Validator */
+		 NULL,                                	/* User data */
+		 ZBUS_OBSERVERS(gpio_in_lis),     			/* observers */
+		 ZBUS_MSG_INIT(0) 						/* Initial value */
+);
+
+static void gpio_in_lis_callback(const struct zbus_channel *chan)
 {
-  	int res = gpio_pin_get(dev,READ_PIN_IN);
-	if(res) {
+	const int *inputLevel = (int*)zbus_chan_const_msg(chan);
+
+	if(*inputLevel == 1) {
 		printf("HIGH\n");
 		gpio_pin_set_raw(gpio_dev, REACT_PIN_OUT , 0);
 	} else {
 		printf("LOW\n");
 		gpio_pin_set_raw(gpio_dev, REACT_PIN_OUT , 1);
+	}
+
+}
+
+ZBUS_LISTENER_DEFINE(gpio_in_lis, gpio_in_lis_callback);
+
+void button_pressed(const struct device *dev,
+		    struct gpio_callback *cb,
+		    uint32_t pins)
+{
+  	uint8_t res = gpio_pin_get(dev,READ_PIN_IN);
+	if(res) {
+		printf("HIGH\n");
+		zbus_chan_pub(&gpio_input_data_chan, &res, K_SECONDS(1));
+	} else {
+		printf("LOW\n");
+		zbus_chan_pub(&gpio_input_data_chan, &res, K_SECONDS(1));
 	}
 }
 
