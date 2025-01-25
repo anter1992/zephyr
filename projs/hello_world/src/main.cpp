@@ -1,0 +1,81 @@
+#include <zephyr/device.h>
+#include <zephyr/kernel.h>
+#include <zephyr/drivers/gpio.h>
+#include <stdio.h>
+
+/* Reserved GPIO pins for esp32
+&gpio0 {
+	gpio-reserved-ranges = <6 6>, // flash
+			<20 1>, <24 1>, <28 4>; // NC
+};
+
+&gpio1 {
+	gpio-reserved-ranges = <5 2>; // GPIO37-38 NC
+}; */
+#define REACT_PIN_OUT 25
+#define READ_PIN_IN 27
+
+/* 	Device which hold the pin configuration, for this purpose esp32 on gpio0 has 32
+	pins so only gpio0 is needed */
+static const struct device *gpio_dev = DEVICE_DT_GET(DT_NODELABEL(gpio0));
+
+static struct gpio_callback button_cb_data;
+
+void button_pressed(const struct device *dev,
+		    struct gpio_callback *cb,
+		    uint32_t pins)
+{
+  	int res = gpio_pin_get(dev,READ_PIN_IN);
+	if(res) {
+		printf("HIGH\n");
+		gpio_pin_set_raw(gpio_dev, REACT_PIN_OUT , 0);
+	} else {
+		printf("LOW\n");
+		gpio_pin_set_raw(gpio_dev, REACT_PIN_OUT , 1);
+	}
+}
+
+int main(void)
+{	
+	/* Check if gpio can be used */
+	if(!device_is_ready(gpio_dev)) {
+		printf("Device not ready");
+		return 0;
+	}
+
+	int ret = gpio_pin_configure(gpio_dev, REACT_PIN_OUT, GPIO_OUTPUT_INACTIVE);
+
+	if( ret != 0) {
+		printf("Pins are not configured");
+		return 0;
+	}
+
+	/* Board has internal pull-up/down resistors of 45kOhm so we can use that and avout the need for 
+	   external ones for the input check*/
+	ret = gpio_pin_configure(gpio_dev, READ_PIN_IN, GPIO_INPUT | GPIO_PULL_UP);
+
+	// Register the interrupt callback
+    ret = gpio_pin_interrupt_configure(gpio_dev, READ_PIN_IN, GPIO_INT_EDGE_BOTH);
+
+	if( ret != 0) {
+		printf("Pins are not configured");
+		return 0;
+	}
+
+	gpio_init_callback(&button_cb_data, button_pressed,
+	  BIT(READ_PIN_IN));
+     gpio_add_callback(gpio_dev, &button_cb_data);
+
+	while(1){
+
+		// ret = gpio_pin_set_raw(gpio_dev, REACT_PIN_OUT , GPIO_OUTPUT_ACTIVE);
+		// printf("LED ON\n");
+		//  k_msleep(1000);
+		// ret = gpio_pin_set_raw(gpio_dev, REACT_PIN_OUT , GPIO_OUTPUT_INACTIVE);
+		// printf("LED OFF\n");
+		// k_msleep(1000);
+
+	}
+
+	return 0;
+}
