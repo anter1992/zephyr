@@ -3,6 +3,7 @@
 #include <zephyr/drivers/gpio.h>
 #include <stdio.h>
 #include <zephyr/zbus/zbus.h>
+#include "ReadClass.h"
 
 /* Reserved GPIO pins for esp32
 &gpio0 {
@@ -67,29 +68,31 @@ int main(void)
 		printf("Device not ready");
 		return 0;
 	}
+	// Initialize ReadClass and ReactClass
+    ReadClass read_class(gpio_dev, READ_PIN_IN);
+	read_class.init();
+	// int ret = gpio_pin_configure(gpio_dev, REACT_PIN_OUT, GPIO_OUTPUT_INACTIVE);
 
-	int ret = gpio_pin_configure(gpio_dev, REACT_PIN_OUT, GPIO_OUTPUT_INACTIVE);
+	// if( ret != 0) {
+	// 	printf("Pins are not configured");
+	// 	return 0;
+	// }
 
-	if( ret != 0) {
-		printf("Pins are not configured");
-		return 0;
-	}
+	// /* Board has internal pull-up/down resistors of 45kOhm so we can use that and avout the need for 
+	//    external ones for the input check*/
+	// ret = gpio_pin_configure(gpio_dev, READ_PIN_IN, GPIO_INPUT | GPIO_PULL_UP);
 
-	/* Board has internal pull-up/down resistors of 45kOhm so we can use that and avout the need for 
-	   external ones for the input check*/
-	ret = gpio_pin_configure(gpio_dev, READ_PIN_IN, GPIO_INPUT | GPIO_PULL_UP);
+	// // Register the interrupt callback
+    // ret = gpio_pin_interrupt_configure(gpio_dev, READ_PIN_IN, GPIO_INT_EDGE_BOTH);
 
-	// Register the interrupt callback
-    ret = gpio_pin_interrupt_configure(gpio_dev, READ_PIN_IN, GPIO_INT_EDGE_BOTH);
+	// if( ret != 0) {
+	// 	printf("Pins are not configured");
+	// 	return 0;
+	// }
 
-	if( ret != 0) {
-		printf("Pins are not configured");
-		return 0;
-	}
-
-	gpio_init_callback(&button_cb_data, button_pressed,
-	  BIT(READ_PIN_IN));
-     gpio_add_callback(gpio_dev, &button_cb_data);
+	// gpio_init_callback(&button_cb_data, button_pressed,
+	//   BIT(READ_PIN_IN));
+    //  gpio_add_callback(gpio_dev, &button_cb_data);
 
 	while(1){
 
