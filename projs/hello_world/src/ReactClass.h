@@ -12,8 +12,13 @@ private:
     const struct device *gpio_dev;
     // Pin of the input
     uint8_t pin;
-    // Worker for the notification of pin change
-    //k_work notification_work;
+    // Workers for the notification of pin change
+    k_work notificationWorkHigh;
+    k_work notificationWorkLow;
+
+    static void notificationWorkHandlerHigh(struct k_work *work); // Work handler function
+    static void notificationWorkHandlerLow(struct k_work *work); // Work handler function
+
 
 public:
     /**

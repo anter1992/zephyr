@@ -17,17 +17,6 @@ private:
     // Worker for the notification of pin change
     k_work notification_work;
 
-public:
-    /**
-     * @brief ReadClass - Handles GPIO input reading and triggering events.
-     */
-    ReadClass(const struct device *gpio_dev, uint8_t pin);
-
-    /**
-     * @brief Set up GPIO input with pull-up and interrupt.
-     */
-    void init();
-
     /**
      * @brief Callback function when the interrupt occurs.
      */
@@ -40,6 +29,17 @@ public:
     */
     static void notificationWorkHandler(struct k_work *work); // Work handler function
 
+
+public:
+    /**
+     * @brief ReadClass - Handles GPIO input reading and triggering events.
+     */
+    ReadClass(const struct device *gpio_dev, uint8_t pin);
+
+    /**
+     * @brief Set up GPIO input with pull-up and interrupt.
+     */
+    void init();
 };
 
 #endif
