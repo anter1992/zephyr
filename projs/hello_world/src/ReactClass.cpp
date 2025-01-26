@@ -34,8 +34,15 @@ void ReactClass::notificationWorkHandlerHigh(struct k_work *work) {
 
     // Check that the instance was actually found
     if(obj) {
-		printf("react_class.powerOff();\n");
-        gpio_pin_set(obj->gpio_dev, obj->pin , 0);
+        // If the state is high, blink the LED 3 times with 100ms between each blink
+		printf("react_class.powerOff() start ;\n");
+        for (uint8_t i = 0; i < 3; i++) {
+            gpio_pin_set(obj->gpio_dev, obj->pin, 1);
+            k_msleep(100);
+            gpio_pin_set(obj->gpio_dev, obj->pin, 0);
+            k_msleep(100);
+        }
+        printf("react_class.powerOff() end ;\n");
     } else{
         // TODO, add error msg
     }    
@@ -48,8 +55,12 @@ void ReactClass::notificationWorkHandlerLow(struct k_work *work) {
 
     // Check that the instance was actually found
     if(obj) {
+        // if the state is low, turn the LED on and keep it on for 500ms.
+        printf("react_class.powerOn()start ;\n");	
         gpio_pin_set(obj->gpio_dev, obj->pin , 1);
-		printf("react_class.powerOn();\n");	
+        k_msleep(500);
+        gpio_pin_set(obj->gpio_dev, obj->pin, 0);
+        printf("react_class.powerOn()end ;\n");	
     } else{
         // TODO, add error msg
     }    
