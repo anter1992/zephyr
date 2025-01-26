@@ -14,6 +14,8 @@ private:
     struct gpio_callback cb_data;
     // Pin of the input
     uint8_t pin;
+    // Worker for the notification of pin change
+    k_work notification_work;
 
 public:
     /**
@@ -32,6 +34,12 @@ public:
     static void button_pressed(const struct device *dev,
 		    struct gpio_callback *cb,
 		    uint32_t pins);
+    
+    /**
+    * @brief Callback function when the interrupt occurs.
+    */
+    static void notificationWorkHandler(struct k_work *work); // Work handler function
+
 };
 
 #endif
