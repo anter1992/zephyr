@@ -16,10 +16,12 @@ void ReactClass::init() {
     //k_work_init(&notification_work, notificationWorkHandler);
 };
 
-
-void ReactClass::powerOn() {
-    gpio_pin_set(gpio_dev, pin , 1);
-}
-void ReactClass::powerOff(){
-    gpio_pin_set(gpio_dev, pin , 0);
+void ReactClass::handleNotification(const uint8_t *inputLevel) {
+    if (*inputLevel == 1) {
+		printf("react_class.powerOff();\n");
+        gpio_pin_set(gpio_dev, pin , 0);
+    } else {
+        gpio_pin_set(gpio_dev, pin , 1);
+		printf("react_class.powerOn();\n");		
+    }
 }

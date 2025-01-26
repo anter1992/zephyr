@@ -25,8 +25,7 @@ public:
      * @brief Set up GPIO input with pull-up and interrupt.
      */
     void init();
-    void powerOn();
-    void powerOff();
+    void handleNotification(const uint8_t *inputLevel);
 };
 
 #endif

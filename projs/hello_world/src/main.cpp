@@ -28,14 +28,10 @@ static ReactClass react_class(gpio_dev, REACT_PIN_OUT);
 // Define the callback function used for gpio input interrupt notification to observers
 void gpio_in_lis_callback(const struct zbus_channel *chan)
 {
-    const int *inputLevel = (int*)zbus_chan_const_msg(chan);
-    if (*inputLevel == 1) {
-        react_class.powerOff();
-		printf("react_class.powerOff();\n");
-    } else {
-        react_class.powerOn();
-		printf("react_class.powerOn();\n");		
-    }
+    const uint8_t *inputLevel = (uint8_t*)zbus_chan_const_msg(chan);
+	if(inputLevel){
+		react_class.handleNotification(inputLevel);
+	}
 }
 
 // Define the ZBUS channel with the specific initialization
