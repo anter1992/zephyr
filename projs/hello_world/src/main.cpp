@@ -22,16 +22,19 @@
 	pins so only gpio0 is needed */
 static const struct device *gpio_dev = DEVICE_DT_GET(DT_NODELABEL(gpio0));
 
+static ReadClass read_class(gpio_dev, READ_PIN_IN);
+static ReactClass react_class(gpio_dev, REACT_PIN_OUT);
+
 // Define the callback function used for gpio input interrupt notification to observers
 void gpio_in_lis_callback(const struct zbus_channel *chan)
 {
     const int *inputLevel = (int*)zbus_chan_const_msg(chan);
-
-	// TODO, iterate through all the classes of instance ReactClass and call x.notify(inputLevel);
     if (*inputLevel == 1) {
-        printf("gpio_in_lis_callback_HIGH\n");
+        react_class.powerOff();
+		printf("react_class.powerOff();\n");
     } else {
-        printf("gpio_in_lis_callback_LOW\n");
+        react_class.powerOn();
+		printf("react_class.powerOn();\n");		
     }
 }
 
@@ -56,19 +59,12 @@ int main(void)
 
 
 	// Initialize ReadClass and ReactClass
-    ReadClass read_class(gpio_dev, READ_PIN_IN);
 	read_class.init();
-    ReactClass react_class(gpio_dev, REACT_PIN_OUT);
 	react_class.init();
-	
+
 	// Loop for the app to run
 	while(1){
-		react_class.powerOn();
-		printf("react_class.powerOn();\n");
-		k_msleep(1000);
-		react_class.powerOff();
-		printf("react_class.powerOff();\n");
-		k_msleep(1000);
+
 	}
 
 	return 0;
