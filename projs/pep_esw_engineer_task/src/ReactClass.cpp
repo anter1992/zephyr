@@ -55,6 +55,6 @@ void ReactClass::notificationWorkHandler(struct k_work *work) {
         }
 
     } else{
-        printf("Device not ready");
+        printf("obj not found!\n");
     }    
 }

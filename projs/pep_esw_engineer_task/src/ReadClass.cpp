@@ -33,7 +33,7 @@ void ReadClass::button_pressed(const struct device *dev,
         // Submit the work item for processing later
         k_work_submit(&obj->notification_work); 
     } else{
-        printf("Device not ready");
+        printf("obj not found!\n");
     }
 }
 
@@ -50,6 +50,6 @@ void ReadClass::notificationWorkHandler(struct k_work *work) {
         // Notify observers of input value
         zbus_chan_pub(&gpio_input_data_chan, &inputVal, K_SECONDS(1));
     } else{
-        printf("Device not ready");
+        printf("obj not found!\n");
     }    
 }
