@@ -8,36 +8,38 @@
 
 class ReadClass {
 private:
-    // Device containing the gpio configuration
+    // Device object containing the GPIO configuration
     const struct device *gpio_dev;
-    // Callback data from the gpio interrupt
+    
+    // GPIO interrupt callback data
     struct gpio_callback cb_data;
-    // Pin of the input
+    
+    // Pin number used for GPIO input
     uint8_t pin;
-    // Worker for the notification of pin change
+    
+    // Worker for handling pin change notifications
     k_work notification_work;
 
     /**
-     * @brief Callback function when the interrupt occurs.
+     * @brief Callback function that is invoked when the interrupt occurs on the GPIO pin.
      */
     static void button_pressed(const struct device *dev,
-		    struct gpio_callback *cb,
-		    uint32_t pins);
-    
-    /**
-    * @brief Callback function when the interrupt occurs.
-    */
-    static void notificationWorkHandler(struct k_work *work); // Work handler function
+                               struct gpio_callback *cb,
+                               uint32_t pins);
 
+    /**
+     * @brief Work handler function that processes the GPIO input change.
+     */
+    static void notificationWorkHandler(struct k_work *work);
 
 public:
     /**
-     * @brief ReadClass - Handles GPIO input reading and triggering events.
+     * @brief Constructor for the ReadClass object.
      */
     ReadClass(const struct device *gpio_dev, uint8_t pin);
 
     /**
-     * @brief Set up GPIO input with pull-up and interrupt.
+     * @brief Initializes the GPIO input with pull-up configuration and interrupt.
      */
     void init();
 };

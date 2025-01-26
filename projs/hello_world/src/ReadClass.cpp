@@ -1,15 +1,15 @@
+/**
+ * @file ReadClass.cpp
+ * @brief Implementation of interrupt handling for GPIO configured as input
+ *          and notifying subsribers about the input value read
+ *
+ */
 #include "ReadClass.h"
 
 extern struct zbus_channel gpio_input_data_chan; // Channel
 
-/**
-* @brief ReadClass - Handles GPIO input reading and triggering events.
-*/
 ReadClass::ReadClass(const struct device *gpio_dev, uint8_t pin): gpio_dev(gpio_dev), pin(pin) {};
 
-/**
-* @brief Set up GPIO input with pull-up and interrupt.
-*/
 void ReadClass::init() {
     /*  Board has internal pull-up/down resistors of 45kOhm so we can use that and avout the need for 
 	external ones for the input check*/
@@ -33,7 +33,7 @@ void ReadClass::button_pressed(const struct device *dev,
         // Submit the work item for processing later
         k_work_submit(&obj->notification_work); 
     } else{
-        // TODO, add error msg
+        printf("Device not ready");
     }
 }
 
@@ -50,6 +50,6 @@ void ReadClass::notificationWorkHandler(struct k_work *work) {
         // Notify observers of input value
         zbus_chan_pub(&gpio_input_data_chan, &inputVal, K_SECONDS(1));
     } else{
-        // TODO, add error msg
+        printf("Device not ready");
     }    
 }

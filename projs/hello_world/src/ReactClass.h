@@ -26,9 +26,13 @@ public:
     ReactClass(const struct device *gpio_dev, uint8_t pin);
 
     /**
-     * @brief Set up GPIO input with pull-up and interrupt.
+     * @brief Initializes the GPIO output and worker to handle the led blinking.
      */
     void init();
+
+    /**
+     * @brief Handler for the notification channel which calls the worker to handle LED blinking
+     */
     void handleNotification(const uint8_t *inputLevel);
 };
 
