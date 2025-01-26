@@ -47,20 +47,6 @@ static void gpio_in_lis_callback(const struct zbus_channel *chan)
 
 ZBUS_LISTENER_DEFINE(gpio_in_lis, gpio_in_lis_callback);
 
-void button_pressed(const struct device *dev,
-		    struct gpio_callback *cb,
-		    uint32_t pins)
-{
-  	uint8_t res = gpio_pin_get(dev,READ_PIN_IN);
-	if(res) {
-		printf("HIGH\n");
-		zbus_chan_pub(&gpio_input_data_chan, &res, K_SECONDS(1));
-	} else {
-		printf("LOW\n");
-		zbus_chan_pub(&gpio_input_data_chan, &res, K_SECONDS(1));
-	}
-}
-
 int main(void)
 {	
 	/* Check if gpio can be used */
@@ -71,6 +57,9 @@ int main(void)
 	// Initialize ReadClass and ReactClass
     ReadClass read_class(gpio_dev, READ_PIN_IN);
 	read_class.init();
+
+	ReadClass read_class2(gpio_dev, REACT_PIN_OUT);
+	read_class2.init();
 	// int ret = gpio_pin_configure(gpio_dev, REACT_PIN_OUT, GPIO_OUTPUT_INACTIVE);
 
 	// if( ret != 0) {
@@ -107,3 +96,17 @@ int main(void)
 
 	return 0;
 }
+
+// void button_pressed(const struct device *dev,
+// 		    struct gpio_callback *cb,
+// 		    uint32_t pins)
+// {
+//  uint8_t res = gpio_pin_get(dev,READ_PIN_IN);
+// 	if(res) {
+// 		printf("HIGH\n");
+// 		zbus_chan_pub(&gpio_input_data_chan, &res, K_SECONDS(1));
+// 	} else {
+// 		printf("LOW\n");
+// 		zbus_chan_pub(&gpio_input_data_chan, &res, K_SECONDS(1));
+// 	}
+// }
